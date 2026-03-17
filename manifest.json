@@ -1,15 +1,27 @@
 {
-  "name": "Kimi Chat AI",
-  "short_name": "KimiChat",
+  "name": "Kimi AI - Todos los Modelos",
+  "short_name": "Kimi AI",
+  "description": "Chat con todos los modelos de Moonshot AI: K2.5, K2, VL, Dev, Linear, Moonlight",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#667eea",
+  "orientation": "portrait",
+  "scope": "./",
   "icons": [
     {
       "src": "https://cdn-icons-png.flaticon.com/512/1698/1698535.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/1698/1698535.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     }
-  ]
+  ],
+  "categories": ["productivity", "utilities"],
+  "prefer_related_applications": false
 }
