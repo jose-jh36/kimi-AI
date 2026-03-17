@@ -1,127 +1,98 @@
-const NVIDIA_KEY = "Nvapi-2x7RYH9AVKbW8vW4wKtQOCuUAaTMPfuf-WsE-S0ONNAEZJeep_NVlJw6QiLfvLCu";
+const API_KEY = "Nvapi-2x7RYH9AVKbW8vW4wKtQOCuUAaTMPfuf-WsE-S0ONNAEZJeep_NVlJw6QiLfvLCu";
 
-const chatContainer = document.getElementById('chatContainer');
+const chatBox = document.getElementById('chatBox');
 const userInput = document.getElementById('userInput');
 const sendBtn = document.getElementById('sendBtn');
 const modelSelect = document.getElementById('modelSelect');
 
+// Cargar chat
 window.onload = () => {
-    const historial = JSON.parse(localStorage.getItem('kimi_chat_history')) || [];
-    historial.forEach(msg => appendMessage(msg.role, msg.text, false));
-    if(historial.length === 0) {
-        appendMessage('kimi', "🚀 ¡Hola! Soy Kimi. ¿Qué vamos a crear hoy?", false);
-    }
+    const history = JSON.parse(localStorage.getItem('chat_log')) || [];
+    history.forEach(m => renderMsg(m.role, m.content));
+    if(!history.length) renderMsg('kimi', "¡Hola! Soy Kimi. ¿En qué puedo ayudarte hoy?");
 };
 
-userInput.addEventListener('input', function() {
-    this.style.height = 'auto';
-    this.style.height = (this.scrollHeight) + 'px';
+// Auto-expandir textarea
+userInput.addEventListener('input', () => {
+    userInput.style.height = 'auto';
+    userInput.style.height = userInput.scrollHeight + 'px';
 });
 
-async function sendMessage() {
+async function handleSend() {
     const text = userInput.value.trim();
-    if (!text) return;
+    if(!text) return;
 
-    appendMessage('user', text);
+    renderMsg('user', text);
     userInput.value = '';
     userInput.style.height = 'auto';
-    
-    const loadingId = showTyping();
+
+    const tempId = Date.now();
+    renderMsg('kimi', "Escribiendo...", tempId);
 
     try {
-        const response = await fetch("https://integrate.api.nvidia.com/v1/chat/completions", {
+        const res = await fetch("https://integrate.api.nvidia.com/v1/chat/completions", {
             method: "POST",
-            headers: {
-                "Authorization": `Bearer ${NVIDIA_KEY}`,
-                "Content-Type": "application/json"
-            },
+            headers: { "Authorization": `Bearer ${API_KEY}`, "Content-Type": "application/json" },
             body: JSON.stringify({
                 "model": modelSelect.value,
                 "messages": [{"role": "user", "content": text}],
-                "temperature": 0.5,
-                "max_tokens": 1024
+                "temperature": 0.5
             })
         });
 
-        const data = await response.json();
-        document.getElementById(loadingId).remove();
+        const data = await res.json();
+        document.getElementById(tempId).remove();
 
-        if (data.choices && data.choices[0]) {
-            const aiText = data.choices[0].message.content;
-            appendMessage('kimi', aiText);
-            await analizarYGenerarZip(aiText, text);
-        }
-    } catch (e) {
-        if(document.getElementById(loadingId)) document.getElementById(loadingId).remove();
-        appendMessage('kimi', "❌ Hubo un problema al conectar con la IA.");
+        const reply = data.choices[0].message.content;
+        renderMsg('kimi', reply);
+        saveChat('kimi', reply);
+        checkCode(reply);
+
+    } catch (err) {
+        document.getElementById(tempId).innerText = "❌ Error al conectar.";
     }
 }
 
-async function analizarYGenerarZip(textoIA, promptUser) {
+function renderMsg(role, content, id = null) {
+    const d = document.createElement('div');
+    d.className = `msg ${role}`;
+    if(id) d.id = id;
+    d.innerText = content;
+    chatBox.appendChild(d);
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+function saveChat(role, content) {
+    let history = JSON.parse(localStorage.getItem('chat_log')) || [];
+    history.push({role, content});
+    localStorage.setItem('chat_log', JSON.stringify(history.slice(-20)));
+}
+
+async function checkCode(text) {
     const zip = new JSZip();
-    const regex = /```(?<lang>[\w]*)\n(?<code>[\s\S]*?)\n```/g;
-    let match;
-    let tieneCodigo = false;
+    const codes = [...text.matchAll(/```(?<l>\w*)\n(?<c>[\s\S]*?)\n```/g)];
+    
+    if(codes.length > 0) {
+        codes.forEach((m, i) => {
+            let ext = m.groups.l || 'txt';
+            let name = `file_${i}.${ext}`;
+            if(ext === 'html') name = 'index.html';
+            if(ext === 'css') name = 'style.css';
+            if(ext === 'js') name = 'script.js';
+            zip.file(name, m.groups.c);
+        });
 
-    while ((match = regex.exec(textoIA)) !== null) {
-        tieneCodigo = true;
-        const lang = match.groups.lang || 'txt';
-        const code = match.groups.code;
-        let nombre = `codigo_${Math.floor(Math.random()*1000)}.${lang}`;
-        if (lang === 'html') nombre = "index.html";
-        else if (lang === 'css') nombre = "style.css";
-        else if (lang === 'js' || lang === 'javascript') nombre = "script.js";
-        zip.file(nombre, code);
-    }
-
-    if (tieneCodigo) {
-        const content = await zip.generateAsync({type:"blob"});
-        const url = URL.createObjectURL(content);
-        const btn = document.createElement('button');
-        btn.className = "btn-zip";
-        btn.innerHTML = "📦 Descargar Proyecto .ZIP";
-        btn.onclick = () => {
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = "Kimi_Project.zip";
-            a.click();
-        };
-        chatContainer.appendChild(btn);
-        chatContainer.scrollTop = chatContainer.scrollHeight;
+        const blob = await zip.generateAsync({type:"blob"});
+        const url = URL.createObjectURL(blob);
+        const b = document.createElement('button');
+        b.className = "btn-zip";
+        b.innerText = "📦 Descargar Proyecto .ZIP";
+        b.onclick = () => { const a = document.createElement('a'); a.href = url; a.download = "Kimi_Code.zip"; a.click(); };
+        chatBox.appendChild(b);
+        chatBox.scrollTop = chatBox.scrollHeight;
     }
 }
 
-function appendMessage(role, text, guardar = true) {
-    const div = document.createElement('div');
-    div.className = `message ${role}`;
-    div.innerText = text;
-    chatContainer.appendChild(div);
-    chatContainer.scrollTop = chatContainer.scrollHeight;
-
-    if (guardar) {
-        let historial = JSON.parse(localStorage.getItem('kimi_chat_history')) || [];
-        historial.push({ role, text });
-        localStorage.setItem('kimi_chat_history', JSON.stringify(historial.slice(-50)));
-    }
-}
-
-function showTyping() {
-    const id = 'type-' + Date.now();
-    const div = document.createElement('div');
-    div.className = 'typing';
-    div.id = id;
-    div.innerText = "Kimi está pensando...";
-    chatContainer.appendChild(div);
-    chatContainer.scrollTop = chatContainer.scrollHeight;
-    return id;
-}
-
-function limpiarHistorial() {
-    if(confirm("¿Borrar todo?")) {
-        localStorage.removeItem('kimi_chat_history');
-        location.reload();
-    }
-}
-
-sendBtn.onclick = sendMessage;
-userInput.onkeydown = (e) => { if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } };
+function clearChat() { localStorage.removeItem('chat_log'); location.reload(); }
+sendBtn.onclick = handleSend;
+userInput.onkeydown = (e) => { if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } };
