@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#667eea">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Kimi Chat Mobile</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="offline-banner" id="offlineBanner">⚠️ Sin conexión a internet.</div>
+
+    <div class="app-container">
+        <header class="header">
+            <h1>🤖 Kimi Chat</h1>
+            <p>Mobile AI & App Generator</p>
+        </header>
+
+        <nav class="model-selector">
+            <div class="selector-group">
+                <label for="modelSelect">Modelo:</label>
+                <select id="modelSelect">
+                    <option value="meta/llama-3.1-8b-instruct">Llama 3.1 8B</option>
+                    <option value="meta/llama-3.1-70b-instruct">Llama 3.1 70B</option>
+                    <option value="nvidia/llama-3.1-405b-instruct">Llama 3.1 405B</option>
+                </select>
+            </div>
+            <button onclick="limpiarHistorial()" class="btn-clear">🗑️ Limpiar</button>
+        </nav>
+
+        <main class="chat-container" id="chatContainer"></main>
+
+        <footer class="input-area">
+            <textarea id="userInput" rows="1" placeholder="Pide una App o escribe algo..."></textarea>
+            <button id="sendBtn">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
+            </button>
+        </footer>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://js.puter.com/v2/"></script>
+    <script src="script.js"></script>
+</body>
+</html>
