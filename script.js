@@ -1,4 +1,4 @@
-const API_KEY = "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";
+const API_KEY = "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";
 
 const chatBox = document.getElementById('chatBox');
 const userInput = document.getElementById('userInput');
