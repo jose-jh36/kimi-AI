@@ -1,11 +1,12 @@
 {
-  "name": "Kimi Chat Mobile",
+  "name": "Kimi Chat AI",
   "short_name": "KimiChat",
-  "description": "Generador de Apps y Chat de IA",
-  "start_url": "index.html",
+  "description": "Asistente de IA y Generador de Apps",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#667eea",
+  "orientation": "portrait",
   "icons": [
     {
       "src": "https://cdn-icons-png.flaticon.com/512/1698/1698535.png",
