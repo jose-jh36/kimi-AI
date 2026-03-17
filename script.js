@@ -5,94 +5,53 @@ const userInput = document.getElementById('userInput');
 const sendBtn = document.getElementById('sendBtn');
 const modelSelect = document.getElementById('modelSelect');
 
-// Cargar chat
-window.onload = () => {
-    const history = JSON.parse(localStorage.getItem('chat_log')) || [];
-    history.forEach(m => renderMsg(m.role, m.content));
-    if(!history.length) renderMsg('kimi', "¡Hola! Soy Kimi. ¿En qué puedo ayudarte hoy?");
-};
+async function enviar() {
+    const prompt = userInput.value.trim();
+    if (!prompt) return;
 
-// Auto-expandir textarea
-userInput.addEventListener('input', () => {
-    userInput.style.height = 'auto';
-    userInput.style.height = userInput.scrollHeight + 'px';
-});
-
-async function handleSend() {
-    const text = userInput.value.trim();
-    if(!text) return;
-
-    renderMsg('user', text);
+    // Mostrar mensaje del usuario
+    agregarMsg('user', prompt);
     userInput.value = '';
-    userInput.style.height = 'auto';
 
-    const tempId = Date.now();
-    renderMsg('kimi', "Escribiendo...", tempId);
+    // Mensaje de carga
+    const loading = agregarMsg('kimi', "Pensando...");
 
     try {
-        const res = await fetch("https://integrate.api.nvidia.com/v1/chat/completions", {
+        const response = await fetch("https://integrate.api.nvidia.com/v1/chat/completions", {
             method: "POST",
-            headers: { "Authorization": `Bearer ${API_KEY}`, "Content-Type": "application/json" },
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${API_KEY}`
+            },
             body: JSON.stringify({
                 "model": modelSelect.value,
-                "messages": [{"role": "user", "content": text}],
+                "messages": [{"role": "user", "content": prompt}],
                 "temperature": 0.5
             })
         });
 
-        const data = await res.json();
-        document.getElementById(tempId).remove();
+        const data = await response.json();
+        loading.remove();
 
-        const reply = data.choices[0].message.content;
-        renderMsg('kimi', reply);
-        saveChat('kimi', reply);
-        checkCode(reply);
-
-    } catch (err) {
-        document.getElementById(tempId).innerText = "❌ Error al conectar.";
+        if (data.choices && data.choices[0]) {
+            agregarMsg('kimi', data.choices[0].message.content);
+        } else {
+            agregarMsg('kimi', "❌ Error: La API no respondió correctamente.");
+        }
+    } catch (error) {
+        loading.remove();
+        agregarMsg('kimi', "❌ Error de conexión. Revisa tu internet.");
     }
 }
 
-function renderMsg(role, content, id = null) {
-    const d = document.createElement('div');
-    d.className = `msg ${role}`;
-    if(id) d.id = id;
-    d.innerText = content;
-    chatBox.appendChild(d);
+function agregarMsg(role, text) {
+    const div = document.createElement('div');
+    div.className = `msg ${role}`;
+    div.innerText = text;
+    chatBox.appendChild(div);
     chatBox.scrollTop = chatBox.scrollHeight;
+    return div;
 }
 
-function saveChat(role, content) {
-    let history = JSON.parse(localStorage.getItem('chat_log')) || [];
-    history.push({role, content});
-    localStorage.setItem('chat_log', JSON.stringify(history.slice(-20)));
-}
-
-async function checkCode(text) {
-    const zip = new JSZip();
-    const codes = [...text.matchAll(/```(?<l>\w*)\n(?<c>[\s\S]*?)\n```/g)];
-    
-    if(codes.length > 0) {
-        codes.forEach((m, i) => {
-            let ext = m.groups.l || 'txt';
-            let name = `file_${i}.${ext}`;
-            if(ext === 'html') name = 'index.html';
-            if(ext === 'css') name = 'style.css';
-            if(ext === 'js') name = 'script.js';
-            zip.file(name, m.groups.c);
-        });
-
-        const blob = await zip.generateAsync({type:"blob"});
-        const url = URL.createObjectURL(blob);
-        const b = document.createElement('button');
-        b.className = "btn-zip";
-        b.innerText = "📦 Descargar Proyecto .ZIP";
-        b.onclick = () => { const a = document.createElement('a'); a.href = url; a.download = "Kimi_Code.zip"; a.click(); };
-        chatBox.appendChild(b);
-        chatBox.scrollTop = chatBox.scrollHeight;
-    }
-}
-
-function clearChat() { localStorage.removeItem('chat_log'); location.reload(); }
-sendBtn.onclick = handleSend;
-userInput.onkeydown = (e) => { if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } };
+sendBtn.onclick = enviar;
+userInput.onkeypress = (e) => { if(e.key === 'Enter') enviar(); };
