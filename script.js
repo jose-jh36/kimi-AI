@@ -1,3 +1,4 @@
+// Tu clave de API de NVIDIA
 const NVIDIA_KEY = "Nvapi-2x7RYH9AVKbW8vW4wKtQOCuUAaTMPfuf-WsE-S0ONNAEZJeep_NVlJw6QiLfvLCu";
 
 const chatContainer = document.getElementById('chatContainer');
@@ -5,24 +6,22 @@ const userInput = document.getElementById('userInput');
 const sendBtn = document.getElementById('sendBtn');
 const modelSelect = document.getElementById('modelSelect');
 
-// Cargar Historial y Bienvenida
+// Cargar historial al iniciar
 window.onload = () => {
     const historial = JSON.parse(localStorage.getItem('kimi_chat_history')) || [];
     historial.forEach(msg => appendMessage(msg.role, msg.text, false));
     
     if(historial.length === 0) {
-        const bienvenida = `🚀 ¡Bienvenido a Kimi Chat Mobile!\n\nPuedo ayudarte a chatear, escribir código o generar proyectos completos en .ZIP. Dime "Crea una app de..." para empezar.`;
-        appendMessage('kimi', bienvenida, false);
+        appendMessage('kimi', "🚀 ¡Hola! Soy Kimi. Pídeme que cree una App o hazme cualquier pregunta.", false);
     }
 };
 
-// Auto-ajuste del teclado/input
+// Ajuste automático del área de texto
 userInput.addEventListener('input', function() {
     this.style.height = 'auto';
     this.style.height = (this.scrollHeight) + 'px';
 });
 
-// Enviar Mensaje a NVIDIA
 async function sendMessage() {
     const text = userInput.value.trim();
     if (!text) return;
@@ -55,33 +54,32 @@ async function sendMessage() {
             const aiText = data.choices[0].message.content;
             appendMessage('kimi', aiText);
             await analizarYGenerarZip(aiText, text);
+        } else {
+            throw new Error("Respuesta vacía");
         }
     } catch (e) {
         removeTypingIndicator();
-        appendMessage('kimi', "❌ Error al conectar. Verifica tu clave de NVIDIA.");
+        appendMessage('kimi', "❌ Error: No se pudo conectar con la API. Verifica tu conexión o saldo en NVIDIA.");
     }
 }
 
-// Analizar bloques de código y crear el ZIP
 async function analizarYGenerarZip(textoIA, promptUser) {
     const zip = new JSZip();
     const regex = /```(?<lang>[\w]*)\n(?<code>[\s\S]*?)\n```/g;
     let match;
     let tieneCodigo = false;
-    const esApp = promptUser.toLowerCase().includes("app") || promptUser.toLowerCase().includes("apk");
 
     while ((match = regex.exec(textoIA)) !== null) {
         tieneCodigo = true;
         const lang = match.groups.lang || 'txt';
         const code = match.groups.code;
-        let ruta = esApp ? "android_project/app/src/main/assets/" : "project_files/";
-        let nombre = `file_${Math.floor(Math.random()*1000)}.${lang}`;
+        let nombre = `archivo_${Math.floor(Math.random()*1000)}.${lang}`;
 
         if (lang === 'html') nombre = "index.html";
         else if (lang === 'css') nombre = "style.css";
         else if (lang === 'js' || lang === 'javascript') nombre = "script.js";
 
-        zip.file(ruta + nombre, code);
+        zip.file(nombre, code);
     }
 
     if (tieneCodigo) {
@@ -89,11 +87,11 @@ async function analizarYGenerarZip(textoIA, promptUser) {
         const url = URL.createObjectURL(content);
         const btn = document.createElement('button');
         btn.className = "btn-zip";
-        btn.innerHTML = esApp ? "📦 Descargar Proyecto App (.ZIP)" : "📦 Descargar Archivos (.ZIP)";
+        btn.innerHTML = "📦 Descargar Archivos (.ZIP)";
         btn.onclick = () => {
             const a = document.createElement('a');
             a.href = url;
-            a.download = esApp ? "Kimi_App_Project.zip" : "Kimi_Export.zip";
+            a.download = "Proyecto_Kimi.zip";
             a.click();
         };
         chatContainer.appendChild(btn);
@@ -111,8 +109,7 @@ function appendMessage(role, text, guardar = true) {
     if (guardar) {
         let historial = JSON.parse(localStorage.getItem('kimi_chat_history')) || [];
         historial.push({ role, text });
-        if (historial.length > 50) historial.shift();
-        localStorage.setItem('kimi_chat_history', JSON.stringify(historial));
+        localStorage.setItem('kimi_chat_history', JSON.stringify(historial.slice(-50)));
     }
 }
 
@@ -131,7 +128,7 @@ function removeTypingIndicator() {
 }
 
 function limpiarHistorial() {
-    if(confirm("¿Borrar toda la conversación?")) {
+    if(confirm("¿Borrar chat?")) {
         localStorage.removeItem('kimi_chat_history');
         location.reload();
     }
