@@ -7,19 +7,19 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="format-detection" content="telephone=no">
     
-    <!-- Optimizado para Samsung A07 -->
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/1698/1698535.png">
     <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/1698/1698535.png">
     <link rel="manifest" href="manifest.json">
 
-    <title>Kimi Chat - Todos los Modelos</title>
+    <title>Kimi AI - Chat Inteligente</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="app-container">
         <header class="header">
-            <h1>🤖 Kimi AI Completo</h1>
+            <h1>🤖 Kimi AI</h1>
             <p class="subtitle">Todos los modelos de Moonshot AI</p>
         </header>
 
@@ -27,63 +27,56 @@
             <div class="selector-group">
                 <label for="modelSelect">Modelo:</label>
                 <select id="modelSelect" class="model-select">
-                    <!-- Familia K2.5 (Multimodal - Enero 2026) -->
+                    <!-- K2.5 (Enero 2026) -->
                     <optgroup label="🔥 K2.5 (Multimodal 2026)">
-                        <option value="moonshotai/Kimi-K2.5" selected>Kimi K2.5 - Multimodal (1T params)</option>
-                        <option value="moonshotai/Kimi-K2.5-Instruct">K2.5 Instruct - Instrucciones</option>
+                        <option value="moonshotai/Kimi-K2.5" selected>Kimi K2.5 - 1T Multimodal</option>
+                        <option value="moonshotai/Kimi-K2.5-Instruct">K2.5 Instruct - Chat</option>
                         <option value="moonshotai/Kimi-K2.5-Thinking">K2.5 Thinking - Razonamiento</option>
-                        <option value="moonshotai/Kimi-K2.5-Agent">K2.5 Agent - Modo agente</option>
-                        <option value="moonshotai/Kimi-K2.5-Swarm">K2.5 Agent Swarm - Multiagente</option>
+                        <option value="moonshotai/Kimi-K2.5-Agent">K2.5 Agent - Autónomo</option>
+                        <option value="moonshotai/Kimi-K2.5-Swarm">K2.5 Swarm - Multiagente</option>
                     </optgroup>
                     
-                    <!-- Familia K2 (Lanzamiento Julio 2025) -->
+                    <!-- K2 (Julio 2025) -->
                     <optgroup label="⚡ K2 (Texto y código)">
-                        <option value="moonshotai/Kimi-K2">Kimi K2 Base (1T params)</option>
-                        <option value="moonshotai/Kimi-K2-Instruct">K2 Instruct - Chat</option>
-                        <option value="moonshotai/Kimi-K2-Instruct-0905">K2 Instruct 0905 - Mejorado</option>
-                        <option value="moonshotai/Kimi-K2-Thinking">K2 Thinking - Razonamiento</option>
+                        <option value="moonshotai/Kimi-K2">Kimi K2 Base</option>
+                        <option value="moonshotai/Kimi-K2-Instruct">K2 Instruct</option>
+                        <option value="moonshotai/Kimi-K2-Instruct-0905">K2 Instruct 0905</option>
+                        <option value="moonshotai/Kimi-K2-Thinking">K2 Thinking</option>
                     </optgroup>
                     
-                    <!-- Modelos especializados -->
+                    <!-- Especializados -->
                     <optgroup label="🧠 Especializados">
-                        <option value="moonshotai/Kimi-VL">Kimi-VL (Vision-Language)</option>
+                        <option value="moonshotai/Kimi-VL">Kimi-VL (Visión)</option>
                         <option value="moonshotai/Kimi-VL-Thinking">Kimi-VL Thinking</option>
-                        <option value="moonshotai/Kimi-Dev">Kimi-Dev (Codificación 72B)</option>
-                        <option value="moonshotai/Kimi-Researcher">Kimi-Researcher (Investigación)</option>
+                        <option value="moonshotai/Kimi-Dev">Kimi-Dev (Código 72B)</option>
+                        <option value="moonshotai/Kimi-Researcher">Kimi-Researcher</option>
                     </optgroup>
                     
-                    <!-- Modelos eficientes -->
+                    <!-- Eficientes -->
                     <optgroup label="⚡ Eficientes">
-                        <option value="moonshotai/Kimi-Linear-48B">Kimi Linear 48B (KDA Attention)</option>
+                        <option value="moonshotai/Kimi-Linear-48B">Kimi Linear 48B</option>
                         <option value="moonshotai/Kimi-Linear-A3B">Kimi Linear A3B</option>
                         <option value="moonshotai/Moonlight-3B">Moonlight 3B</option>
                         <option value="moonshotai/Moonlight-16B">Moonlight 16B MoE</option>
                     </optgroup>
-                    
-                    <!-- Versiones anteriores -->
-                    <optgroup label="📚 Versiones anteriores">
-                        <option value="moonshotai/Kimi-K1.5">Kimi K1.5 (Razonamiento)</option>
-                        <option value="moonshotai/Moonshot-v1">Moonshot v1 (128K contexto)</option>
-                    </optgroup>
                 </select>
             </div>
-            <button onclick="limpiarHistorial()" class="btn-clear" aria-label="Limpiar conversación">
+            <button onclick="limpiarHistorial()" class="btn-clear">
                 <span class="btn-icon">🗑️</span>
                 <span class="btn-text">Limpiar</span>
             </button>
         </nav>
 
-        <main class="chat-container" id="chatContainer" role="log" aria-live="polite"></main>
+        <main class="chat-container" id="chatContainer"></main>
 
         <footer class="input-area">
             <textarea 
                 id="userInput" 
                 rows="1" 
-                placeholder="Escribe tu mensaje..." 
-                aria-label="Mensaje para Kimi"
+                placeholder="Escribe tu mensaje..."
                 enterkeyhint="send"
             ></textarea>
-            <button id="sendBtn" aria-label="Enviar mensaje">
+            <button id="sendBtn" aria-label="Enviar">
                 <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
                     <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
                 </svg>
@@ -91,7 +84,6 @@
         </footer>
     </div>
 
-    <!-- Carga optimizada de scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="script.js"></script>
 </body>
