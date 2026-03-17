@@ -5,22 +5,24 @@ const userInput = document.getElementById('userInput');
 const sendBtn = document.getElementById('sendBtn');
 const modelSelect = document.getElementById('modelSelect');
 
-// Iniciar App
+// Cargar Historial y Bienvenida
 window.onload = () => {
     const historial = JSON.parse(localStorage.getItem('kimi_chat_history')) || [];
     historial.forEach(msg => appendMessage(msg.role, msg.text, false));
+    
     if(historial.length === 0) {
-        appendMessage('kimi', '👋 ¡Bienvenido! Pídeme código o una App y generaré un .ZIP organizado.', false);
+        const bienvenida = `🚀 ¡Bienvenido a Kimi Chat Mobile!\n\nPuedo ayudarte a chatear, escribir código o generar proyectos completos en .ZIP. Dime "Crea una app de..." para empezar.`;
+        appendMessage('kimi', bienvenida, false);
     }
 };
 
-// Expandir área de texto
+// Auto-ajuste del teclado/input
 userInput.addEventListener('input', function() {
     this.style.height = 'auto';
     this.style.height = (this.scrollHeight) + 'px';
 });
 
-// Enviar Mensaje
+// Enviar Mensaje a NVIDIA
 async function sendMessage() {
     const text = userInput.value.trim();
     if (!text) return;
@@ -42,7 +44,7 @@ async function sendMessage() {
                 "model": modelSelect.value,
                 "messages": [{"role": "user", "content": text}],
                 "temperature": 0.5,
-                "max_tokens": 1500
+                "max_tokens": 1024
             })
         });
 
@@ -56,31 +58,28 @@ async function sendMessage() {
         }
     } catch (e) {
         removeTypingIndicator();
-        appendMessage('kimi', "❌ Error: Verifica tu API Key o conexión.");
+        appendMessage('kimi', "❌ Error al conectar. Verifica tu clave de NVIDIA.");
     }
 }
 
-// Analizar y empaquetar ZIP
+// Analizar bloques de código y crear el ZIP
 async function analizarYGenerarZip(textoIA, promptUser) {
     const zip = new JSZip();
     const regex = /```(?<lang>[\w]*)\n(?<code>[\s\S]*?)\n```/g;
     let match;
     let tieneCodigo = false;
-    const esApp = promptUser.toLowerCase().match(/app|apk|proyecto|crear/);
+    const esApp = promptUser.toLowerCase().includes("app") || promptUser.toLowerCase().includes("apk");
 
     while ((match = regex.exec(textoIA)) !== null) {
         tieneCodigo = true;
         const lang = match.groups.lang || 'txt';
         const code = match.groups.code;
-        let ruta = esApp ? "android_app/src/main/assets/" : "codigo_fuente/";
-        let nombre = `archivo_${Math.floor(Math.random()*1000)}.${lang}`;
+        let ruta = esApp ? "android_project/app/src/main/assets/" : "project_files/";
+        let nombre = `file_${Math.floor(Math.random()*1000)}.${lang}`;
 
         if (lang === 'html') nombre = "index.html";
         else if (lang === 'css') nombre = "style.css";
-        else if (lang === 'js' || lang === 'javascript') {
-            nombre = "script.js";
-            if(esApp) ruta = "android_app/src/main/assets/js/";
-        }
+        else if (lang === 'js' || lang === 'javascript') nombre = "script.js";
 
         zip.file(ruta + nombre, code);
     }
@@ -94,7 +93,7 @@ async function analizarYGenerarZip(textoIA, promptUser) {
         btn.onclick = () => {
             const a = document.createElement('a');
             a.href = url;
-            a.download = esApp ? "Kimi_App_Project.zip" : "Kimi_Code.zip";
+            a.download = esApp ? "Kimi_App_Project.zip" : "Kimi_Export.zip";
             a.click();
         };
         chatContainer.appendChild(btn);
@@ -132,7 +131,7 @@ function removeTypingIndicator() {
 }
 
 function limpiarHistorial() {
-    if(confirm("¿Deseas borrar toda la conversación?")) {
+    if(confirm("¿Borrar toda la conversación?")) {
         localStorage.removeItem('kimi_chat_history');
         location.reload();
     }
