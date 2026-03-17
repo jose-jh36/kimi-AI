@@ -2,39 +2,32 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <link rel="manifest" href="manifest.json">
-    <title>Kimi Chat AI</title>
+    <title>Kimi AI</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="app-wrapper">
         <header class="main-header">
-            <h1>🤖 Kimi Chat</h1>
-            <span>NVIDIA AI Powered</span>
+            <h3>🤖 Kimi Chat</h3>
         </header>
 
         <div class="top-bar">
-            <select id="modelSelect">
+            <select id="modelSelect" style="flex:1; padding:5px;">
                 <option value="meta/llama-3.1-8b-instruct">Kimi Lite</option>
                 <option value="meta/llama-3.1-70b-instruct">Kimi Pro</option>
-                <option value="nvidia/llama-3.1-405b-instruct">Kimi Ultra</option>
             </select>
-            <button onclick="clearChat()" class="btn-clear">🗑️</button>
+            <button onclick="clearChat()">🗑️</button>
         </div>
 
-        <main id="chatBox" class="chat-viewport"></main>
+        <main id="chatBox" class="chat-viewport" style="display:flex; flex-direction:column;"></main>
 
         <footer class="input-container">
-            <textarea id="userInput" rows="1" placeholder="Escribe un mensaje..."></textarea>
-            <button id="sendBtn">
-                <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" fill="currentColor"></path></svg>
-            </button>
+            <textarea id="userInput" placeholder="Escribe aquí..."></textarea>
+            <button id="sendBtn">➤</button>
         </footer>
     </div>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="script.js"></script>
 </body>
