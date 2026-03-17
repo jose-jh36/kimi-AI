@@ -3,43 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="theme-color" content="#667eea">
-    
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/1698/1698535.png">
     <link rel="manifest" href="manifest.json">
-
-    <title>Kimi Chat Mobile</title>
+    <title>Kimi Chat AI</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="app-container">
-        <header class="header">
+    <div class="app-wrapper">
+        <header class="main-header">
             <h1>🤖 Kimi Chat</h1>
-            <p>Powered by NVIDIA AI</p>
+            <span>NVIDIA AI Powered</span>
         </header>
 
-        <nav class="model-selector">
-            <div class="selector-group">
-                <label for="modelSelect">IA:</label>
-                <select id="modelSelect">
-                    <option value="meta/llama-3.1-8b-instruct">Kimi Lite</option>
-                    <option value="meta/llama-3.1-70b-instruct">Kimi Pro</option>
-                    <option value="nvidia/llama-3.1-405b-instruct">Kimi Ultra</option>
-                </select>
-            </div>
-            <button onclick="limpiarHistorial()" class="btn-clear">🗑️ Limpiar</button>
-        </nav>
+        <div class="top-bar">
+            <select id="modelSelect">
+                <option value="meta/llama-3.1-8b-instruct">Kimi Lite</option>
+                <option value="meta/llama-3.1-70b-instruct">Kimi Pro</option>
+                <option value="nvidia/llama-3.1-405b-instruct">Kimi Ultra</option>
+            </select>
+            <button onclick="clearChat()" class="btn-clear">🗑️</button>
+        </div>
 
-        <main class="chat-container" id="chatContainer"></main>
+        <main id="chatBox" class="chat-viewport"></main>
 
-        <footer class="input-area">
+        <footer class="input-container">
             <textarea id="userInput" rows="1" placeholder="Escribe un mensaje..."></textarea>
             <button id="sendBtn">
-                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-                    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
-                </svg>
+                <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" fill="currentColor"></path></svg>
             </button>
         </footer>
     </div>
