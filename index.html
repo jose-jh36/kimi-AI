@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#667eea">
     
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -24,9 +24,9 @@
             <div class="selector-group">
                 <label for="modelSelect">IA:</label>
                 <select id="modelSelect">
-                    <option value="meta/llama-3.1-8b-instruct">Kimi Lite (Rápido)</option>
-                    <option value="meta/llama-3.1-70b-instruct">Kimi Pro (Potente)</option>
-                    <option value="nvidia/llama-3.1-405b-instruct">Kimi Ultra (Máximo)</option>
+                    <option value="meta/llama-3.1-8b-instruct">Kimi Lite</option>
+                    <option value="meta/llama-3.1-70b-instruct">Kimi Pro</option>
+                    <option value="nvidia/llama-3.1-405b-instruct">Kimi Ultra</option>
                 </select>
             </div>
             <button onclick="limpiarHistorial()" class="btn-clear">🗑️ Limpiar</button>
@@ -35,7 +35,7 @@
         <main class="chat-container" id="chatContainer"></main>
 
         <footer class="input-area">
-            <textarea id="userInput" rows="1" placeholder="Pídeme una App o escribe algo..."></textarea>
+            <textarea id="userInput" rows="1" placeholder="Escribe un mensaje..."></textarea>
             <button id="sendBtn">
                 <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
                     <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
